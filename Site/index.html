@@ -16,7 +16,15 @@
                     $(function()
                     { //DOM Ready
                         freeboard.initialize(true);
-
+                        freeboard.loadDashboard({
+                            "version": 1,
+                            "allow_edit": false,
+                            "plugins": [],
+                            "panes": [],
+                            "datasources": [],
+                            "columns": 3
+                        });
+                        console.log(JSON.stringify(freeboard.serialize(), null, '\t'))
                         var hashpattern = window.location.hash.match(/(&|#)source=([^&]+)/);
                         if (hashpattern !== null) {
                             $.getJSON(hashpattern[2], function(data) {
@@ -45,12 +53,6 @@
                 <h1 id="board-logo" class="title bordered">freeboard</h1>
                 <div id="board-actions">
                     <ul class="board-toolbar vertical">
-                        <li data-bind="click: loadDashboardFromLocalFile"><i id="full-screen-icon" class="icon-folder-open icon-white"></i><label id="full-screen">Load Freeboard</label></li>
-                        <li><i class="icon-download-alt icon-white"></i>
-                            <label data-bind="click: saveDashboardClicked">Save Freeboard</label>
-                            <label style="display: none;" data-bind="click: saveDashboard" data-pretty="true">[Pretty]</label>
-                            <label style="display: none;" data-bind="click: saveDashboard" data-pretty="false">[Minified]</label>
-                        </li>
                         <li id="add-pane" data-bind="click: createPane"><i class="icon-plus icon-white"></i><label>Add Pane</label></li>
                     </ul>
                 </div>
