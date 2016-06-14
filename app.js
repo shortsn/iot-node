@@ -14,12 +14,11 @@ app.use(express.static(__dirname + '/Site'));
 //   led.blink(50);
 // });
 
-
 var server = app.listen(8080, function() {
 
     var host = server.address().address;
     var port = server.address().port;
 
-    console.log('Freeboard running at http://%s:%s', host, port);
-
+    // http://localhost:8080/#source=dashboardS
+    console.log('Dashboard running at http://%s:%s', host, port);
 });
