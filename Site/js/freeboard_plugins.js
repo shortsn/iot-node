@@ -106,8 +106,7 @@ DatasourceModel = function(theFreeboardModel, datasourcePlugins) {
 	}
 }
 
-DeveloperConsole = function(theFreeboardModel)
-{
+DeveloperConsole = function(theFreeboardModel) {
 	function showDeveloperConsole()
 	{
 		var pluginScriptsInputs = [];
@@ -202,8 +201,7 @@ DeveloperConsole = function(theFreeboardModel)
 	}
 }
 
-function DialogBox(contentElement, title, okTitle, cancelTitle, okCallback)
-{
+function DialogBox(contentElement, title, okTitle, cancelTitle, okCallback) {
 	var modal_width = 900;
 
 	// Initialize our modal overlay
@@ -258,8 +256,7 @@ function DialogBox(contentElement, title, okTitle, cancelTitle, okCallback)
 	overlay.fadeIn(200);
 }
 
-function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
-{
+function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI) {
 	var self = this;
 
 	var SERIALIZATION_VERSION = 1;
@@ -532,36 +529,15 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 		{
 			alert('Unable to load a file in this browser.');
 		}
-	}
-
-	this.saveDashboardClicked = function(){
-		var target = $(event.currentTarget);
-		var siblingsShown = target.data('siblings-shown') || false;
-		if(!siblingsShown){
-			$(event.currentTarget).siblings('label').fadeIn('slow');
-		}else{
-			$(event.currentTarget).siblings('label').fadeOut('slow');
-		}
-		target.data('siblings-shown', !siblingsShown);
-	}
-
-	this.saveDashboard = function(_thisref, event)
-	{
-		var pretty = $(event.currentTarget).data('pretty');
-		var contentType = 'application/octet-stream';
-		var a = document.createElement('a');
-		if(pretty){
-			var blob = new Blob([JSON.stringify(self.serialize(), null, '\t')], {'type': contentType});
-		}else{
-			var blob = new Blob([JSON.stringify(self.serialize())], {'type': contentType});
-		}
-		document.body.appendChild(a);
-		a.href = window.URL.createObjectURL(blob);
-		a.download = "dashboard.json";
-		a.target="_self";
-		a.click();
-	}
-
+  }
+  
+  this.saveDashboard = function () {
+    var xhr = new XMLHttpRequest();
+    xhr.open("PUT", "./dashboard", true);
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    xhr.send(JSON.stringify(self.serialize()));
+  }
+  
 	this.addDatasource = function(datasource)
 	{
 		self.datasources.push(datasource);
@@ -670,8 +646,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 	}
 }
 
-function FreeboardUI()
-{
+function FreeboardUI() {
 	var PANE_MARGIN = 10;
 	var PANE_WIDTH = 300;
 	var MIN_COLUMNS = 3;
@@ -1286,8 +1261,7 @@ function PaneModel(theFreeboardModel, widgetPlugins) {
 	}
 }
 
-PluginEditor = function(jsEditor, valueEditor)
-{
+PluginEditor = function(jsEditor, valueEditor) {
 	function _displayValidationError(settingName, errorMessage)
 	{
 		var errorElement = $('<div class="validation-error"></div>').html(errorMessage);
@@ -1830,8 +1804,7 @@ PluginEditor = function(jsEditor, valueEditor)
 	}
 }
 
-ValueEditor = function(theFreeboardModel)
-{
+ValueEditor = function(theFreeboardModel) {
 	var _veDatasourceRegex = new RegExp(".*datasources\\[\"([^\"]*)(\"\\])?(.*)$");
 
 	var dropdown = null;
@@ -3353,6 +3326,90 @@ $.extend(freeboard, jQuery.eventEmitter);
 			newInstanceCallback(new clockDatasource(settings, updateCallback));
 		}
 	});
+
+	var jsonWebSocketDatasource = function(settings, updateCallback) {
+		var self = this;
+		var currentSettings = settings;
+		var ws;
+		
+		var onOpen=function()
+		{
+			console.info("WebSocket(%s) Opened",currentSettings.url);
+		}
+		
+		var onClose=function()
+		{
+			console.info("WebSocket Closed");
+		}
+		
+		var onMessage=function(event)
+		{
+			var data=event.data;
+			
+			console.info("WebSocket received %s",data);
+			
+			var objdata=JSON.parse(data);
+			
+			if(typeof objdata == "object")
+			{
+				updateCallback(objdata);
+			}
+			else
+			{
+				updateCallback(data);
+			}
+			
+		}
+		
+		function createWebSocket()
+		{
+			if(ws) ws.close();
+			
+			var url=currentSettings.url;
+			ws=new WebSocket(url);
+			
+			ws.onopen=onOpen;
+			ws.onclose=onClose;
+			ws.onmessage=onMessage;
+		}
+		
+		createWebSocket();
+
+		this.updateNow = function()
+		{
+			createWebSocket();
+		}
+
+		this.onDispose = function()
+		{
+			ws.close();
+		}
+
+		this.onSettingsChanged = function(newSettings)
+		{
+			currentSettings = newSettings;
+			
+			createWebSocket();
+		}
+	};
+
+	freeboard.loadDatasourcePlugin({
+		type_name  : "JSON WebSocket",
+		display_name : "JSON WebSocket Push Datasource",
+		description : "A push datasource based on browser built-in WebSocket implementation",
+		settings   : [
+			{
+				name        : "url",
+				display_name: "URL",
+				type        : "text"
+			}
+		],
+		newInstance: function(settings, newInstanceCallback, updateCallback)
+		{
+			newInstanceCallback( new jsonWebSocketDatasource(settings, updateCallback));
+		}
+	});
+
 
 }());
 
