@@ -1,4 +1,6 @@
-﻿var server = require('http').createServer()
+﻿var fs = require('fs');
+
+var server = require('http').createServer()
   , url = require('url')
   , WebSocketServer = require('ws').Server
   , wss = new WebSocketServer({ server: server })
@@ -26,8 +28,12 @@ app.route('/dashboard')
       res.status(406).send('Not Acceptable');
       return;
     }
-    console.log(req.body)
-    res.sendStatus(200);
+    var filename = __dirname + "/Site/dashboard.json"
+    fs.writeFile(filename, JSON.stringify(req.body, null, '\t'), function (err) {
+      if (err) return console.log(err);
+      console.log(filename + " saved");
+      res.sendStatus(200);
+    });
   });
 
 wss.on('connection', function connection(ws) {
