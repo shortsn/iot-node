@@ -10,7 +10,7 @@
 				"4": 1
 			},
 			"col": {
-				"3": 3,
+				"3": 1,
 				"4": 4
 			},
 			"col_width": 1,
@@ -21,6 +21,41 @@
 						"size": "regular",
 						"value": "datasources[\"Uhrzeit\"][\"time_string_value\"]",
 						"animate": true
+					}
+				}
+			]
+		},
+		{
+			"title": "socket",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 1
+			},
+			"col": {
+				"3": 2,
+				"4": 3
+			},
+			"col_width": "1",
+			"widgets": [
+				{
+					"type": "text_widget",
+					"settings": {
+						"size": "regular",
+						"value": "datasources[\"socket\"][\"foo\"]",
+						"sparkline": true,
+						"animate": true,
+						"units": "foo"
+					}
+				},
+				{
+					"type": "text_widget",
+					"settings": {
+						"size": "regular",
+						"value": "datasources[\"socket\"][\"bar\"]",
+						"sparkline": true,
+						"animate": true,
+						"units": "bar"
 					}
 				}
 			]
@@ -41,10 +76,12 @@
 				"url": "localhost:8080",
 				"events": [
 					{
-						"eventName": "fump"
+						"eventName": "foo"
+					},
+					{
+						"eventName": "bar"
 					}
-				],
-				"rooms": []
+				]
 			}
 		}
 	],
