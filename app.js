@@ -38,7 +38,9 @@ var connections = 0;
 
 var id = setInterval(function () {
   if (connections > 0) {
-    io.emit("fump", JSON.stringify({ value: counter++ }));
+    counter++
+    io.emit("foo", JSON.stringify({ foo: counter*1.5 }));
+    io.emit("bar", JSON.stringify({ bar: counter*2.5 }));
   }
 }, 1000);
 
