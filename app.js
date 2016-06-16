@@ -1,13 +1,10 @@
-﻿var fs = require('fs');
-
-var server = require('http').createServer()
-  , url = require('url')
-  , WebSocketServer = require('ws').Server
-  , wss = new WebSocketServer({ server: server })
-  , express = require('express')
-  , bodyParser = require('body-parser')
+﻿var express = require('express')
   , app = express()
-  , port = 8080;
+  , server = require('http').createServer(app)
+  , io = require('socket.io').listen(server)
+  , conf = require('./config.json')
+  , bodyParser = require('body-parser')
+  , fs = require('fs');
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/Site'));
@@ -36,24 +33,32 @@ app.route('/dashboard')
     });
   });
 
-wss.on('connection', function connection(ws) {
-  var location = url.parse(ws.upgradeReq.url, true);
-  // you might use location.query.access_token to authenticate or share sessions
-  // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
+var counter = 0;
+var connections = 0;
 
-  var counter = 0;  
-  var id = setInterval(function () {
-    ws.send(JSON.stringify({ value : counter++ }), function () { /* ignore errors */ });
-  }, 1000);
-  console.log('started client interval');
-  ws.on('close', function () {
-    console.log('stopping client interval');
-    clearInterval(id);
+var id = setInterval(function () {
+  if (connections > 0) {
+    io.emit("fump", JSON.stringify({ value: counter++ }));
+  }
+}, 1000);
+
+io.on('connection', function (socket) {
+  connections++;
+  console.log("New client connected.");
+  // On subscribe events join client to room
+  socket.on('subscribe', function(room) {
+    socket.join(room);
+    console.log("Client joined room: " + room);
+  });
+      
+  // On disconnect events
+  socket.on('disconnect', function(socket) {
+    console.log("Client disconnect from rooms.");
+    connections--;
   });
 });
 
-server.on('request', app);
-server.listen(port, function () {
+server.listen(conf.port, function () {
   var host = server.address().address;
   var port = server.address().port;
 

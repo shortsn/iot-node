@@ -121,7 +121,7 @@
 				type_name : "node_js",
 				display_name : "Node.js (Socket.io)",
 				description : "A real-time stream datasource from node.js servers using socket.io.",
-				external_scripts : [ "https://cdn.socket.io/socket.io-1.0.6.js" ],
+				external_scripts : [ "socket.io/socket.io.js" ],
 				settings : [
 						{
 							name : "url",

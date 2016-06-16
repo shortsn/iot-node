@@ -33,6 +33,19 @@
 			"settings": {
 				"refresh": 1
 			}
+		},
+		{
+			"name": "socket",
+			"type": "node_js",
+			"settings": {
+				"url": "localhost:8080",
+				"events": [
+					{
+						"eventName": "fump"
+					}
+				],
+				"rooms": []
+			}
 		}
 	],
 	"columns": 4
