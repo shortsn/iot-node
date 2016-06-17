@@ -28,7 +28,7 @@ app.route('/dashboard')
     var filename = __dirname + "/Site/dashboard.json"
     fs.writeFile(filename, JSON.stringify(req.body, null, '\t'), function (err) {
       if (err) return console.log(err);
-      console.log(filename + " saved");
+      console.log("Dashboard saved ->" + filename);
       res.sendStatus(200);
     });
   });
