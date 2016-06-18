@@ -1,11 +1,28 @@
 ﻿var express = require('express')
-  , app = express()
-  , server = require('http').createServer(app)
-  , io = require('socket.io').listen(server)
+  , fs = require('fs')
   , conf = require('./config.json')
+  , app = express()
   , bodyParser = require('body-parser')
-  , fs = require('fs');
+  , server
+  , options;
 
+if (conf.ssl) {
+  var https = require('https');
+  options = {
+    port: conf.https.port,
+    cert: fs.readFileSync(conf.https.cert, 'utf8'),
+    key: fs.readFileSync(conf.https.key, 'utf8')
+  };
+  server = https.createServer(options, app);
+} else {
+  var http = require('http');
+  options = {
+    port: conf.http.port
+  };
+  server = http.createServer(app);
+}
+
+var io = require('socket.io').listen(server)
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/Site'));
 
@@ -42,7 +59,7 @@ var id = setInterval(function () {
     io.emit("foo", JSON.stringify({ foo: counter*1.5 }));
     io.emit("bar", JSON.stringify({ bar: counter*2.5 }));
   }
-}, 1000);
+}, 500);
 
 io.on('connection', function (socket) {
   connections++;
@@ -60,7 +77,7 @@ io.on('connection', function (socket) {
   });
 });
 
-server.listen(conf.port, function () {
+server.listen(options, function () {
   var host = server.address().address;
   var port = server.address().port;
 

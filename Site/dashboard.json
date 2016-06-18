@@ -83,26 +83,24 @@
 			"name": "foo",
 			"type": "node_js",
 			"settings": {
-				"url": "localhost:8080",
+				"url": "http://localhost:8080",
 				"events": [
 					{
 						"eventName": "foo"
 					}
-				],
-				"name": "foo"
+				]
 			}
 		},
 		{
 			"name": "bar",
 			"type": "node_js",
 			"settings": {
-				"url": "localhost:8080",
+				"url": "http://localhost:8080",
 				"events": [
 					{
 						"eventName": "bar"
 					}
-				],
-				"name": "bar"
+				]
 			}
 		}
 	],
