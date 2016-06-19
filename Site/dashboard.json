@@ -32,40 +32,40 @@
 				"4": 1
 			},
 			"col": {
-				"3": 2,
-				"4": 1
+				"3": 3,
+				"4": 3
 			},
 			"col_width": 1,
 			"widgets": [
 				{
-					"type": "sparkline",
+					"type": "text_widget",
 					"settings": {
-						"value": [
-							"datasources[\"foo\"][\"foo\"]",
-							"datasources[\"bar\"][\"bar\"]"
-						],
-						"include_legend": true,
-						"legend": "Foo,Bar"
+						"title": "photoresistor",
+						"size": "regular",
+						"value": "datasources[\"photoresistor\"][\"value\"]",
+						"sparkline": true,
+						"animate": true
 					}
 				},
 				{
 					"type": "text_widget",
 					"settings": {
+						"title": "temperature",
 						"size": "regular",
-						"value": "datasources[\"foo\"][\"foo\"]",
+						"value": "datasources[\"temperature\"][\"celsius\"]",
 						"sparkline": true,
 						"animate": true,
-						"units": "Foo"
+						"units": "°C"
 					}
 				},
 				{
 					"type": "text_widget",
 					"settings": {
+						"title": "mic",
 						"size": "regular",
-						"value": "datasources[\"bar\"][\"bar\"]",
+						"value": "datasources[\"mic\"][\"value\"]",
 						"sparkline": true,
-						"animate": true,
-						"units": "Bar"
+						"animate": false
 					}
 				}
 			]
@@ -80,25 +80,37 @@
 			}
 		},
 		{
-			"name": "foo",
+			"name": "mic",
 			"type": "node_js",
 			"settings": {
 				"url": "http://localhost:8080",
 				"events": [
 					{
-						"eventName": "foo"
+						"eventName": "mic"
 					}
 				]
 			}
 		},
 		{
-			"name": "bar",
+			"name": "temperature",
 			"type": "node_js",
 			"settings": {
 				"url": "http://localhost:8080",
 				"events": [
 					{
-						"eventName": "bar"
+						"eventName": "temperature"
+					}
+				]
+			}
+		},
+		{
+			"name": "photoresistor",
+			"type": "node_js",
+			"settings": {
+				"url": "http://localhost:8080",
+				"events": [
+					{
+						"eventName": "photoresistor"
 					}
 				]
 			}

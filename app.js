@@ -26,16 +26,6 @@ var io = require('socket.io').listen(server)
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/Site'));
 
-// var five = require("johnny-five");
-// var board = new five.Board();
-
-// board.on("ready", function() {
-//   // Create an Led on pin 13
-//   var led = new five.Led(13);
-//   // Blink every half second
-//   led.blink(50);
-// });
-
 app.route('/dashboard')
   .put(function (req, res) {
     if (!req.is('application/json')) {
@@ -48,30 +38,52 @@ app.route('/dashboard')
       console.log("Dashboard saved ->" + filename);
       res.sendStatus(200);
     });
-  });
+});
 
 var counter = 0;
 var connections = 0;
 
-var id = setInterval(function () {
-  if (connections > 0) {
-    counter++
-    io.emit("foo", JSON.stringify({ foo: counter*1.5 }));
-    io.emit("bar", JSON.stringify({ bar: counter*2.5 }));
-  }
-}, 500);
+var five = require("johnny-five");
+var board = new five.Board({
+    repl: false,
+    debug: false,
+  });
+
+board.on("ready", function () {
+  var temperature = new five.Thermometer({
+    controller: "LM35",
+    pin: "A0"
+  });
+  temperature.on("change", function () {
+    io.emit("temperature", JSON.stringify({ celsius: this.celsius }));
+  });
+
+  var mic = new five.Sensor("A1");
+  mic.on("change", function() {
+    io.emit("mic", JSON.stringify({ value: this.value >> 2 }));
+  });
+  
+  photoresistor = new five.Sensor({
+    pin: "A2"
+  });
+  photoresistor.on("change", function () {
+    io.emit("photoresistor", JSON.stringify({ value: this.value }));
+  });
+
+});
+
 
 io.on('connection', function (socket) {
   connections++;
   console.log("New client connected.");
   // On subscribe events join client to room
-  socket.on('subscribe', function(room) {
+  socket.on('subscribe', function (room) {
     socket.join(room);
     console.log("Client joined room: " + room);
   });
-      
+    
   // On disconnect events
-  socket.on('disconnect', function(socket) {
+  socket.on('disconnect', function (socket) {
     console.log("Client disconnect from rooms.");
     connections--;
   });
