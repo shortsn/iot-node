@@ -58,16 +58,20 @@ board.on("ready", function () {
     io.emit("temperature", JSON.stringify({ celsius: this.celsius }));
   });
 
-  var mic = new five.Sensor("A1");
+  var mic = new five.Sensor({
+    pin: "A1",
+    threshold: 1
+  });
   mic.on("change", function() {
-    io.emit("mic", JSON.stringify({ value: this.value >> 2 }));
+    io.emit("mic", JSON.stringify({ value: this.value }));
   });
   
   photoresistor = new five.Sensor({
-    pin: "A2"
+    pin: "A2",
+    threshold: 1
   });
   photoresistor.on("change", function () {
-    io.emit("photoresistor", JSON.stringify({ value: this.value }));
+    io.emit("photoresistor", JSON.stringify({ value: this.scaleTo(0, 100) }));
   });
 
 });
